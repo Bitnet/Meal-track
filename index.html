@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBIZA PLAN — Tracker</title>
+<style>
+  :root {
+    --bg: #111118;
+    --surface: #23232f;
+    --border: #38384a;
+    --accent: #e8ff47;
+    --accent2: #47c8ff;
+    --accent3: #ff6b47;
+    --text: #ffffff;
+    --muted: #9a9ab0;
+    --success: #47ffb2;
+    --phase1: #47c8ff;
+    --phase2: #ff9f47;
+    --phase3a: #ff6b47;
+    --phase3b: #e8ff47;
+    --font-main: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'SF Mono', 'Courier New', monospace;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: #111118 !important;
+color: #ffffff !important;
+font-family: var(–font-main);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* Grid background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
+
+.container {
+position: relative;
+z-index: 1;
+max-width: 680px;
+margin: 0 auto;
+padding: 24px 16px 80px;
+}
+
+/* Header */
+.header {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+margin-bottom: 32px;
+gap: 16px;
+}
+
+.header-left {}
+.header-title {
+font-size: 28px;
+font-weight: 800;
+letter-spacing: -1px;
+line-height: 1;
+color: var(–accent);
+}
+.header-subtitle {
+font-size: 12px;
+color: var(–muted);
+font-family: var(–font-mono);
+margin-top: 4px;
+text-transform: uppercase;
+letter-spacing: 2px;
+}
+
+.countdown-box {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 10px 16px;
+text-align: right;
+flex-shrink: 0;
+}
+.countdown-num {
+font-size: 32px;
+font-weight: 800;
+color: var(–accent);
+line-height: 1;
+font-family: var(–font-mono);
+}
+.countdown-label {
+font-size: 10px;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 1px;
+font-family: var(–font-mono);
+}
+
+/* Phase pill */
+.phase-banner {
+border-radius: 8px;
+padding: 12px 16px;
+margin-bottom: 24px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border: 1px solid;
+}
+.phase-banner .phase-name {
+font-size: 14px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 2px;
+}
+.phase-banner .phase-desc {
+font-size: 11px;
+opacity: 0.7;
+font-family: var(–font-mono);
+}
+.phase-banner .phase-kcal {
+font-size: 18px;
+font-weight: 800;
+font-family: var(–font-mono);
+}
+
+/* Macros strip */
+.macros-strip {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+margin-bottom: 24px;
+}
+.macro-card {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+border-radius: 8px;
+padding: 10px 12px;
+text-align: center;
+}
+.macro-val {
+font-size: 20px;
+font-weight: 800;
+font-family: var(–font-mono);
+}
+.macro-label {
+font-size: 10px;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+.macro-progress {
+height: 3px;
+background: var(–border);
+border-radius: 2px;
+margin-top: 6px;
+overflow: hidden;
+}
+.macro-progress-bar {
+height: 100%;
+border-radius: 2px;
+transition: width 0.4s ease;
+}
+
+/* Section */
+.section-title {
+font-size: 11px;
+font-family: var(–font-mono);
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 3px;
+margin-bottom: 10px;
+margin-top: 24px;
+}
+
+/* Meal card */
+.meal-card {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+border-radius: 10px;
+margin-bottom: 8px;
+overflow: hidden;
+transition: border-color 0.2s;
+}
+.meal-card.completed {
+border-color: var(–success);
+opacity: 0.7;
+}
+.meal-card.completed .meal-header {
+background: rgba(71,255,178,0.05);
+}
+
+.meal-header {
+display: flex;
+align-items: center;
+padding: 12px 14px;
+gap: 12px;
+cursor: pointer;
+user-select: none;
+}
+
+.meal-check {
+width: 22px;
+height: 22px;
+border-radius: 50%;
+border: 2px solid var(–muted);
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s;
+cursor: pointer;
+}
+.meal-check.done {
+background: var(–success);
+border-color: var(–success);
+}
+.meal-check.done::after {
+content: ‘✓’;
+font-size: 12px;
+color: #000;
+font-weight: 700;
+}
+
+.meal-info { flex: 1; }
+.meal-time {
+font-size: 11px;
+color: var(–muted);
+font-family: var(–font-mono);
+}
+.meal-name {
+font-size: 14px;
+font-weight: 700;
+line-height: 1.2;
+}
+.meal-kcal {
+font-size: 13px;
+font-family: var(–font-mono);
+color: var(–accent);
+font-weight: 700;
+flex-shrink: 0;
+}
+
+.meal-foods {
+padding: 0 14px 12px 48px;
+display: none;
+}
+.meal-card.open .meal-foods { display: block; }
+
+.food-item {
+font-size: 12px;
+color: var(–muted);
+padding: 2px 0;
+line-height: 1.5;
+}
+.food-item::before {
+content: ‘—’;
+margin-right: 6px;
+color: var(–border);
+}
+.meal-macros {
+font-size: 11px;
+font-family: var(–font-mono);
+color: var(–accent2);
+margin-top: 6px;
+padding-top: 6px;
+border-top: 1px solid var(–border);
+}
+
+/* Entreno card */
+.workout-card {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+border-radius: 10px;
+padding: 14px;
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 8px;
+}
+.workout-icon {
+font-size: 22px;
+flex-shrink: 0;
+}
+.workout-info { flex: 1; }
+.workout-name { font-size: 14px; font-weight: 700; }
+.workout-note { font-size: 11px; color: var(–muted); font-family: var(–font-mono); margin-top: 2px; }
+
+.workout-check {
+width: 28px;
+height: 28px;
+border-radius: 6px;
+border: 2px solid var(–muted);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s;
+flex-shrink: 0;
+}
+.workout-check.done {
+background: var(–accent);
+border-color: var(–accent);
+}
+.workout-check.done::after {
+content: ‘✓’;
+color: #000;
+font-weight: 700;
+font-size: 14px;
+}
+
+/* Peso */
+.weight-card {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+border-radius: 10px;
+padding: 14px;
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 8px;
+}
+.weight-input {
+background: var(–bg);
+border: 1px solid var(–border);
+color: var(–text);
+font-family: var(–font-mono);
+font-size: 20px;
+font-weight: 700;
+width: 90px;
+text-align: center;
+border-radius: 6px;
+padding: 6px 10px;
+outline: none;
+transition: border-color 0.2s;
+flex-shrink: 0;
+}
+.weight-input:focus { border-color: var(–accent); }
+.weight-unit {
+font-size: 14px;
+color: var(–muted);
+font-family: var(–font-mono);
+}
+.weight-label { font-size: 14px; font-weight: 700; flex: 1; }
+.weight-trend {
+font-size: 12px;
+font-family: var(–font-mono);
+color: var(–muted);
+}
+
+/* Suplementos */
+.supps-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+margin-bottom: 8px;
+}
+.supp-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 10px 12px;
+display: flex;
+align-items: center;
+gap: 10px;
+cursor: pointer;
+transition: all 0.15s;
+user-select: none;
+}
+.supp-card.done {
+border-color: var(–success);
+background: rgba(71,255,178,0.04);
+}
+.supp-dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+border: 2px solid var(–muted);
+flex-shrink: 0;
+transition: all 0.2s;
+}
+.supp-card.done .supp-dot {
+background: var(–success);
+border-color: var(–success);
+}
+.supp-name { font-size: 12px; font-weight: 600; line-height: 1.2; flex: 1; }
+.supp-time { font-size: 10px; color: var(–muted); font-family: var(–font-mono); margin-top: 1px; }
+
+/* Agua */
+.agua-card {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+border-radius: 10px;
+padding: 14px;
+margin-bottom: 8px;
+}
+.agua-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+.agua-title { font-size: 14px; font-weight: 700; }
+.agua-target { font-size: 12px; font-family: var(–font-mono); color: var(–accent2); }
+.agua-dots {
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+}
+.agua-dot {
+width: 32px;
+height: 32px;
+border-radius: 6px;
+border: 2px solid var(–border);
+cursor: pointer;
+transition: all 0.15s;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 10px;
+font-family: var(–font-mono);
+color: var(–muted);
+}
+.agua-dot.filled {
+background: var(–accent2);
+border-color: var(–accent2);
+color: #000;
+font-weight: 700;
+}
+
+/* Nav days */
+.day-nav {
+display: flex;
+gap: 6px;
+overflow-x: auto;
+padding-bottom: 4px;
+margin-bottom: 24px;
+scrollbar-width: none;
+}
+.day-nav::-webkit-scrollbar { display: none; }
+
+.day-btn {
+flex-shrink: 0;
+padding: 8px 14px;
+border-radius: 6px;
+border: 1px solid var(–border);
+background: var(–surface);
+color: var(–muted);
+font-family: var(–font-mono);
+font-size: 11px;
+cursor: pointer;
+transition: all 0.15s;
+text-align: center;
+line-height: 1.3;
+white-space: nowrap;
+}
+.day-btn:hover { border-color: var(–accent); color: var(–text); }
+.day-btn.active {
+background: var(–accent);
+border-color: var(–accent);
+color: #000;
+font-weight: 700;
+}
+.day-btn.today-btn {
+border-color: var(–accent2);
+color: var(–accent2);
+}
+.day-btn.today-btn.active {
+background: var(–accent2);
+color: #000;
+}
+
+/* Notas */
+.notes-area {
+width: 100%;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-family: var(–font-main);
+font-size: 13px;
+padding: 12px;
+resize: vertical;
+min-height: 70px;
+outline: none;
+transition: border-color 0.2s;
+}
+.notes-area:focus { border-color: var(–accent); }
+
+/* Progress bar total */
+.daily-progress {
+background: #23232f !important;
+border: 1px solid #38384a !important;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+border-radius: 10px;
+padding: 14px;
+margin-bottom: 24px;
+}
+.dp-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 8px;
+}
+.dp-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.dp-pct { font-size: 20px; font-weight: 800; font-family: var(–font-mono); color: var(–accent); }
+.dp-bar-bg { height: 6px; background: var(–border); border-radius: 3px; overflow: hidden; }
+.dp-bar { height: 100%; background: var(–accent); border-radius: 3px; transition: width 0.5s ease; }
+
+/* Footer nav */
+.bottom-nav {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+background: rgba(10,10,12,0.95);
+border-top: 1px solid var(–border);
+display: flex;
+z-index: 100;
+backdrop-filter: blur(10px);
+}
+.nav-btn {
+flex: 1;
+padding: 14px 8px;
+border: none;
+background: transparent;
+color: var(–muted);
+cursor: pointer;
+font-family: var(–font-main);
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1px;
+transition: color 0.15s;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 4px;
+}
+.nav-btn.active { color: var(–accent); }
+.nav-btn span:first-child { font-size: 18px; }
+
+/* Tabs */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Historial */
+.history-item {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 12px 14px;
+margin-bottom: 8px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.history-date {
+font-family: var(–font-mono);
+font-size: 11px;
+color: var(–muted);
+min-width: 60px;
+}
+.history-weight {
+font-family: var(–font-mono);
+font-size: 18px;
+font-weight: 700;
+color: var(–accent);
+}
+.history-phase {
+font-size: 10px;
+padding: 2px 8px;
+border-radius: 4px;
+font-family: var(–font-mono);
+font-weight: 700;
+}
+.history-meals {
+margin-left: auto;
+font-size: 11px;
+font-family: var(–font-mono);
+color: var(–muted);
+}
+
+/* Reglas */
+.rule-item {
+background: var(–surface);
+border: 1px solid var(–border);
+border-left: 3px solid var(–accent);
+border-radius: 8px;
+padding: 10px 14px;
+margin-bottom: 8px;
+font-size: 13px;
+line-height: 1.5;
+}
+.rule-item strong { color: var(–accent); }
+
+/* LIGHT THEME */
+body.light {
+–bg: #e8e8f0;
+–surface: #ffffff;
+–border: #c0c0d0;
+–text: #0a0a0c;
+–muted: #666680;
+}
+body.light::before { display: none; }
+body.light .bottom-nav { background: rgba(245,245,247,0.95); }
+body.light .weight-input { background: #f0f0f2; color: #0a0a0c; }
+body.light .notes-area { background: #f0f0f2; color: #0a0a0c; }
+
+.theme-btn {
+width: 36px; height: 36px;
+border-radius: 8px;
+border: 1px solid var(–border);
+background: var(–surface);
+color: var(–text);
+font-size: 18px;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+transition: all 0.2s;
+}
+</style>
+
+</head>
+<body>
+<style>
+  html, body { background: #111118 !important; }
+  .meal-card, .macro-card, .workout-card, .weight-card, .agua-card,
+  .daily-progress, .supp-card, .day-btn, .countdown-box, .history-item,
+  .rule-item, .phase-banner { background-color: #23232f !important; }
+  .bottom-nav { background: #111118 !important; }
+</style>
+
+<div class="container">
+
+  <!-- Header -->
+
+  <div class="header">
+    <div class="header-left">
+      <div class="header-title">IBIZA PLAN</div>
+      <div class="header-subtitle" id="current-date-label">— · Jordi · 89kg</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <div class="countdown-box">
+        <div class="countdown-num" id="countdown-num">—</div>
+        <div class="countdown-label">días para<br>Ibiza</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day nav -->
+
+  <div class="day-nav" id="day-nav"></div>
+
+  <!-- Tabs -->
+
+  <div id="tab-hoy" class="tab-content active">
+    <!-- Phase banner -->
+    <div class="phase-banner" id="phase-banner">
+      <div>
+        <div class="phase-name" id="phase-name">—</div>
+        <div class="phase-desc" id="phase-desc">—</div>
+      </div>
+      <div class="phase-kcal" id="phase-kcal">—</div>
+    </div>
+
+```
+<!-- Progress -->
+<div class="daily-progress">
+  <div class="dp-header">
+    <div class="dp-label">Progreso del día</div>
+    <div class="dp-pct" id="dp-pct">0%</div>
+  </div>
+  <div class="dp-bar-bg"><div class="dp-bar" id="dp-bar" style="width:0%"></div></div>
+</div>
+
+<!-- Macros -->
+<div class="section-title">Macros objetivo</div>
+<div class="macros-strip">
+  <div class="macro-card">
+    <div class="macro-val" style="color:var(--accent2)" id="macro-p-val">—g</div>
+    <div class="macro-label">Proteína</div>
+    <div class="macro-progress"><div class="macro-progress-bar" id="macro-p-bar" style="background:var(--accent2);width:0%"></div></div>
+  </div>
+  <div class="macro-card">
+    <div class="macro-val" style="color:var(--accent)" id="macro-c-val">—g</div>
+    <div class="macro-label">Carbos</div>
+    <div class="macro-progress"><div class="macro-progress-bar" id="macro-c-bar" style="background:var(--accent);width:0%"></div></div>
+  </div>
+  <div class="macro-card">
+    <div class="macro-val" style="color:var(--accent3)" id="macro-g-val">—g</div>
+    <div class="macro-label">Grasas</div>
+    <div class="macro-progress"><div class="macro-progress-bar" id="macro-g-bar" style="background:var(--accent3);width:0%"></div></div>
+  </div>
+</div>
+
+<!-- Comidas -->
+<div class="section-title">Comidas</div>
+<div id="meals-container"></div>
+
+<!-- Entreno -->
+<div class="section-title">Entreno</div>
+<div class="workout-card">
+  <div class="workout-icon">🏋️</div>
+  <div class="workout-info">
+    <div class="workout-name" id="workout-name">—</div>
+    <div class="workout-note" id="workout-note">—</div>
+  </div>
+  <div class="workout-check" id="workout-check" onclick="toggleWorkout()"></div>
+</div>
+
+<!-- Peso -->
+<div class="section-title">Peso matinal</div>
+<div class="weight-card">
+  <div class="weight-label">⚖️ Peso en ayunas</div>
+  <input class="weight-input" type="number" id="weight-input" placeholder="89.0" step="0.1" min="70" max="120" oninput="saveWeight()">
+  <div class="weight-unit">kg</div>
+</div>
+<div class="weight-trend" id="weight-trend" style="text-align:right;margin-bottom:4px;font-size:11px;color:var(--muted);"></div>
+
+<!-- Agua -->
+<div class="section-title">Hidratación</div>
+<div class="agua-card">
+  <div class="agua-header">
+    <div class="agua-title">💧 Agua</div>
+    <div class="agua-target" id="agua-target">Objetivo: 3L</div>
+  </div>
+  <div class="agua-dots" id="agua-dots"></div>
+</div>
+
+<!-- Suplementos -->
+<div class="section-title">Suplementos</div>
+<div class="supps-grid" id="supps-grid"></div>
+
+<!-- Notas -->
+<div class="section-title">Notas del día</div>
+<textarea class="notes-area" id="notes-area" placeholder="¿Cómo te has sentido? Energía, hambre, sensaciones..." oninput="saveNotes()"></textarea>
+```
+
+  </div><!-- end tab-hoy -->
+
+  <!-- HISTORIAL TAB -->
+
+  <div id="tab-historial" class="tab-content">
+    <div class="section-title">Evolución del peso</div>
+    <canvas id="weight-chart" style="width:100%;height:180px;margin-bottom:16px;border-radius:8px;background:var(--surface);padding:12px;border:1px solid var(--border);"></canvas>
+    <div class="section-title">Registro diario</div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- REGLAS TAB -->
+
+  <div id="tab-reglas" class="tab-content">
+    <div class="section-title">Reglas de oro</div>
+    <div class="rule-item">💧 <strong>Agua:</strong> 3L/día Fase 1-2 · 4L vaciado final · 2L en carga</div>
+    <div class="rule-item">🥩 <strong>Proteína:</strong> 200g mínimo todos los días sin excepción</div>
+    <div class="rule-item">🏋️ <strong>Entreno:</strong> F1 normal · F2 bajos -20% volumen, mismo peso · F3A ligero · F3B pecho+pierna obligatorio</div>
+    <div class="rule-item">🚫 <strong>Alcohol:</strong> Cero durante las 3 semanas</div>
+    <div class="rule-item">🧂 <strong>Sal:</strong> Moderada F1-F2 · Mínima en vaciado y carga</div>
+    <div class="rule-item">💊 <strong>Creatina:</strong> Mantén todo el plan (el mito de dejarla en definición es falso)</div>
+    <div class="rule-item">📊 <strong>Peso:</strong> Cada mañana en ayunas. Lo que importa es la tendencia semanal</div>
+
+```
+<div class="section-title" style="margin-top:28px;">Fases del plan</div>
+<div class="rule-item" style="border-left-color:var(--phase1)">
+  <strong style="color:var(--phase1)">FASE 1 · 7–20 Abr · 14 días</strong><br>
+  ~1.950 kcal · 200P / 150C / 55G<br>
+  Déficit controlado. Recarga el sábado o domingo (220g carbos ese día).
+</div>
+<div class="rule-item" style="border-left-color:var(--phase2)">
+  <strong style="color:var(--phase2)">FASE 2 · 21–27 Abr · 7 días</strong><br>
+  Días bajos (L-J): ~1.700 kcal · 210P / 70C / 45G<br>
+  Días mant. (V-D): vuelve a Fase 1 (1.950 kcal)<br>
+  -20% volumen entreno en días bajos
+</div>
+<div class="rule-item" style="border-left-color:var(--phase3a)">
+  <strong style="color:var(--phase3a)">FASE 3A · 28–29 Abr · 2 días</strong><br>
+  ~1.700 kcal · 210P / 60C / 45G<br>
+  Vaciado final. 4L agua. Sin sal. Entreno muy ligero.
+</div>
+<div class="rule-item" style="border-left-color:var(--phase3b)">
+  <strong style="color:var(--phase3b)">FASE 3B · 30 Abr – 1 May · 2 días</strong><br>
+  ~2.600 kcal · 200P / 380C / 40G<br>
+  🔥 CARGA FINAL. Carbos cada 3h. Agua solo 2L. Mínima grasa y sal.
+</div>
+```
+
+  </div>
+
+</div><!-- end container -->
+
+<!-- Bottom Nav -->
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-hoy" onclick="switchTab('hoy')">
+    <span>📋</span><span>Hoy</span>
+  </button>
+  <button class="nav-btn" id="nav-historial" onclick="switchTab('historial')">
+    <span>📈</span><span>Historial</span>
+  </button>
+  <button class="nav-btn" id="nav-reglas" onclick="switchTab('reglas')">
+    <span>📌</span><span>Plan</span>
+  </button>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const PLAN_START = new Date('2026-04-07');
+const IBIZA_DATE = new Date('2026-05-01');
+
+const PHASES = {
+  phase1: {
+    name: 'FASE 1 — DÉFICIT',
+    desc: '~1.950 kcal · 200P / 150C / 55G',
+    kcal: '1.950 kcal',
+    color: 'var(--phase1)',
+    macros: { p: 200, c: 150, g: 55 },
+    agua: 3,
+    workoutNote: 'Entreno normal — mismo peso, mismas series',
+  },
+  phase2low: {
+    name: 'FASE 2 — VACIADO (día bajo)',
+    desc: '~1.700 kcal · 210P / 70C / 45G',
+    kcal: '1.700 kcal',
+    color: 'var(--phase2)',
+    macros: { p: 210, c: 70, g: 45 },
+    agua: 3.5,
+    workoutNote: '-20% volumen (1 serie menos) · mismo peso en barra',
+  },
+  phase2maint: {
+    name: 'FASE 2 — MANTENIMIENTO (V-D)',
+    desc: '~1.950 kcal · 200P / 150C / 55G',
+    kcal: '1.950 kcal',
+    color: 'var(--phase2)',
+    macros: { p: 200, c: 150, g: 55 },
+    agua: 3,
+    workoutNote: 'Vuelve a Fase 1 — recupera energía para la carga',
+  },
+  phase3a: {
+    name: 'FASE 3A — ÚLTIMO VACIADO',
+    desc: '~1.700 kcal · 210P / 60C / 45G',
+    kcal: '1.700 kcal',
+    color: 'var(--phase3a)',
+    macros: { p: 210, c: 60, g: 45 },
+    agua: 4,
+    workoutNote: 'Entreno muy ligero — pocas series, activa el músculo',
+  },
+  phase3b: {
+    name: '🔥 FASE 3B — CARGA FINAL · PEAK',
+    desc: '~2.600 kcal · 200P / 380C / 40G',
+    kcal: '2.600 kcal',
+    color: 'var(--phase3b)',
+    macros: { p: 200, c: 380, g: 40 },
+    agua: 2,
+    workoutNote: '⚡ PECHO + PIERNA — OBLIGATORIO para absorción de glucógeno',
+  },
+};
+
+const MEALS = {
+  phase1: [
+    { time: '7:30', name: 'Desayuno', kcal: 450, p: 35, c: 55, g: 10,
+      foods: ['50g avena', '2 yogures griegos proteicos Hacendado', 'Frutos rojos congelados al gusto', '15g frutos secos', 'SIN plátano'] },
+    { time: '11:00', name: 'Media mañana', kcal: 205, p: 18, c: 22, g: 5,
+      foods: ['2 rebanadas pan espelta 100% integral', '80g jamón o lomo ibérico'] },
+    { time: '14:30', name: 'Comida', kcal: 385, p: 55, c: 30, g: 5,
+      foods: ['250g pechuga de pollo o merluza/bacalao', '150g patata, boniato o arroz cocido', 'Verdura abundante (sin límite)'] },
+    { time: '17:30', name: 'Pre-entreno', kcal: 140, p: 8, c: 25, g: 1,
+      foods: ['1 plátano mediano', '20g pavo en lonchas o 1 clara de huevo cocida'] },
+    { time: 'Post-gym', name: 'Post-entreno', kcal: 150, p: 30, c: 3, g: 2,
+      foods: ['30g batido de proteína con agua (inmediato al salir)'] },
+    { time: '21:30', name: 'Cena', kcal: 265, p: 45, c: 8, g: 6,
+      foods: ['200–250g merluza o bacalao al horno/plancha', 'Verdura abundante', 'SIN carbohidrato en cena', 'Opcional: 1 huevo cocido si tienes hambre'] },
+  ],
+  phase2low: [
+    { time: '7:30', name: 'Desayuno', kcal: 275, p: 38, c: 12, g: 8,
+      foods: ['3 claras de huevo + 1 huevo entero revueltos', '2 yogures griegos proteicos Hacendado', 'Frutos rojos congelados', 'SIN frutos secos, SIN plátano'] },
+    { time: '11:00', name: 'Media mañana', kcal: 155, p: 20, c: 12, g: 3,
+      foods: ['80g pechuga de pavo en lonchas', '1 rebanada pan espelta (reducido)'] },
+    { time: '14:30', name: 'Comida', kcal: 285, p: 52, c: 10, g: 4,
+      foods: ['250g pechuga de pollo o bacalao', 'SIN carbohidrato — solo verdura abundante', 'Pepino, lechuga, tomate, brócoli, espinacas...'] },
+    { time: '17:30', name: 'Pre-entreno', kcal: 80, p: 12, c: 8, g: 0,
+      foods: ['1 yogur griego proteico solo', 'SIN plátano ni pan'] },
+    { time: 'Post-gym', name: 'Post-entreno', kcal: 150, p: 30, c: 3, g: 2,
+      foods: ['30g batido de proteína con agua'] },
+    { time: '21:30', name: 'Cena', kcal: 220, p: 42, c: 6, g: 3,
+      foods: ['200g merluza o bacalao', 'Verdura al vapor o plancha — SIN carbohidrato', 'Sal mínima'] },
+  ],
+  phase2maint: null, // same as phase1
+  phase3a: [
+    { time: '7:30', name: 'Desayuno', kcal: 265, p: 40, c: 8, g: 8,
+      foods: ['4 claras de huevo + 1 huevo entero', '2 yogures griegos proteicos', 'SIN carbohidrato ninguno'] },
+    { time: '11:00', name: 'Media mañana', kcal: 105, p: 22, c: 0, g: 2,
+      foods: ['100g pechuga de pavo o pollo', 'SIN pan'] },
+    { time: '14:30', name: 'Comida', kcal: 315, p: 60, c: 8, g: 5,
+      foods: ['300g pechuga de pollo a la plancha', 'Solo verdura — lechuga, pepino, brócoli', 'SIN carbohidrato, SIN sal extra'] },
+    { time: '17:30', name: 'Pre-entreno', kcal: 80, p: 12, c: 8, g: 0,
+      foods: ['1 yogur griego solo', 'Entreno LIGERO estos días'] },
+    { time: 'Post-gym', name: 'Post-entreno', kcal: 150, p: 30, c: 3, g: 2,
+      foods: ['30g batido de proteína'] },
+    { time: '21:30', name: 'Cena', kcal: 198, p: 40, c: 5, g: 2,
+      foods: ['200g merluza o bacalao', 'Verdura al vapor — SIN sal, SIN carbohidrato'] },
+  ],
+  phase3b: [
+    { time: '7:30', name: 'Desayuno', kcal: 645, p: 38, c: 110, g: 6,
+      foods: ['100g avena (el doble)', '2 yogures griegos proteicos', '2 plátanos maduros', 'Frutos rojos', 'SIN frutos secos (minimiza grasas)'] },
+    { time: '11:00', name: 'Media mañana', kcal: 390, p: 22, c: 65, g: 5,
+      foods: ['4 rebanadas pan espelta con jamón ibérico', '1 plátano'] },
+    { time: '14:30', name: 'Comida', kcal: 545, p: 48, c: 80, g: 4,
+      foods: ['200g pechuga de pollo', '350g arroz blanco cocido o patata (máximo carbos aquí)', 'Verdura — poca cantidad hoy'] },
+    { time: '17:30', name: 'Pre-entreno ⚡', kcal: 265, p: 5, c: 60, g: 1,
+      foods: ['ENTRENO OBLIGATORIO: pectoral + pierna (grupos grandes)', '2 plátanos + 1 rebanada pan con miel'] },
+    { time: 'Post-gym', name: 'Post-entreno', kcal: 245, p: 32, c: 25, g: 2,
+      foods: ['30g batido de proteína', '1 plátano extra post-entreno'] },
+    { time: '21:30', name: 'Cena', kcal: 405, p: 45, c: 45, g: 5,
+      foods: ['200g merluza o salmón', '200g arroz blanco cocido o boniato', 'Verdura ligera'] },
+  ],
+};
+
+const SUPPLEMENTS = [
+  { name: 'Creatina', time: 'Post-entreno o mañana' },
+  { name: 'Omega-3', time: 'Con comida principal' },
+  { name: 'Mag. Bisglicinato', time: 'Noche, antes de dormir' },
+  { name: 'D3 + K2', time: 'Mañana, con grasa' },
+  { name: 'Zinc', time: 'Noche, antes de dormir' },
+  { name: 'Ashwagandha', time: 'Mañana o noche' },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+
+let currentDateKey = todayKey();
+let activeTab = 'hoy';
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getStorage(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch { return def; }
+}
+function setStorage(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+function getDayData(dateKey) {
+  return getStorage(`ibiza_day_${dateKey}`, {
+    meals: {},
+    workout: false,
+    weight: '',
+    agua: 0,
+    supps: {},
+    notes: ''
+  });
+}
+function saveDayData(dateKey, data) {
+  setStorage(`ibiza_day_${dateKey}`, data);
+}
+
+// ============================================================
+// PHASE LOGIC
+// ============================================================
+
+function getPhaseForDate(dateKey) {
+  const d = new Date(dateKey + 'T12:00:00');
+  const day = Math.floor((d - new Date('2026-04-07T12:00:00')) / 86400000) + 1;
+  const dow = d.getDay(); // 0=Sun,1=Mon,...
+
+  if (day < 1 || day > 25) return null;
+
+  // Phase 1: days 1–14 (Apr 7–20)
+  if (day >= 1 && day <= 14) {
+    // weekend recharge?
+    const isWeekend = dow === 0 || dow === 6;
+    return { key: 'phase1', isRecharge: isWeekend };
+  }
+  // Phase 2: days 15–21 (Apr 21–27)
+  if (day >= 15 && day <= 18) { // Mon–Thu (21–24 Apr)
+    return { key: 'phase2low' };
+  }
+  if (day >= 19 && day <= 21) { // Fri–Sun (25–27 Apr)
+    return { key: 'phase2maint' };
+  }
+  // Phase 3A: days 22–23 (28–29 Apr)
+  if (day >= 22 && day <= 23) {
+    return { key: 'phase3a' };
+  }
+  // Phase 3B: days 24–25 (30 Apr–1 May)
+  if (day >= 24 && day <= 25) {
+    return { key: 'phase3b' };
+  }
+  return null;
+}
+
+function getPhaseData(phaseInfo) {
+  if (!phaseInfo) return null;
+  const p = { ...PHASES[phaseInfo.key] };
+  if (phaseInfo.isRecharge) {
+    p.name += ' (RECARGA 🔄)';
+    p.desc = '⚡ Sube carbos a 220g hoy — resetea leptina';
+    const m = { ...p.macros };
+    m.c = 220;
+    p.macros = m;
+  }
+  return p;
+}
+
+function getMealsForPhase(phaseKey) {
+  if (phaseKey === 'phase2maint') return MEALS['phase1'];
+  return MEALS[phaseKey] || MEALS['phase1'];
+}
+
+function getWorkoutForPhase(phaseInfo) {
+  if (!phaseInfo) return { name: 'Fuera del plan', note: '' };
+  const p = PHASES[phaseInfo.key];
+  return { name: 'Gym 🏋️', note: p.workoutNote };
+}
+
+// ============================================================
+// BUILD DAYS NAV
+// ============================================================
+
+function buildDayNav() {
+  const nav = document.getElementById('day-nav');
+  nav.innerHTML = '';
+  const today = todayKey();
+
+  for (let i = 0; i < 25; i++) {
+    const d = new Date('2026-04-07T12:00:00');
+    d.setDate(d.getDate() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const phase = getPhaseForDate(key);
+    const dayNum = i + 1;
+
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (key === today ? ' today-btn' : '') + (key === currentDateKey ? ' active' : '');
+    btn.dataset.key = key;
+
+    const dd = d.getDate();
+    const mm = d.toLocaleString('es', { month: 'short' });
+    btn.innerHTML = `D${dayNum}<br>${dd} ${mm}`;
+
+    if (phase) {
+      const colors = { phase1: '#47c8ff', phase2low: '#ff9f47', phase2maint: '#ff9f47', phase3a: '#ff6b47', phase3b: '#e8ff47' };
+      btn.style.borderBottomColor = colors[phase.key] || 'transparent';
+      btn.style.borderBottomWidth = '3px';
+    }
+
+    btn.onclick = () => selectDay(key);
+    nav.appendChild(btn);
+  }
+
+  // scroll to active
+  setTimeout(() => {
+    const active = nav.querySelector('.active');
+    if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+  }, 100);
+}
+
+function selectDay(key) {
+  currentDateKey = key;
+  document.querySelectorAll('.day-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.key === key);
+  });
+  renderDay();
+}
+
+// ============================================================
+// RENDER DAY
+// ============================================================
+
+function renderDay() {
+  const phaseInfo = getPhaseForDate(currentDateKey);
+  const phaseData = getPhaseData(phaseInfo);
+  const dayData = getDayData(currentDateKey);
+  const today = todayKey();
+
+  // Countdown
+  const ibiza = new Date('2026-05-01T12:00:00');
+  const now = new Date();
+  const diff = Math.ceil((ibiza - now) / 86400000);
+  document.getElementById('countdown-num').textContent = Math.max(0, diff);
+
+  // Date label
+  const d = new Date(currentDateKey + 'T12:00:00');
+  document.getElementById('current-date-label').textContent =
+    d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · Jordi';
+
+  // Phase banner
+  const banner = document.getElementById('phase-banner');
+  if (phaseData) {
+    banner.style.borderColor = phaseData.color;
+    banner.style.background = phaseData.color.replace('var(', '').replace(')', '') === phaseData.color
+      ? phaseData.color + '15'
+      : `color-mix(in srgb, ${phaseData.color} 8%, transparent)`;
+    document.getElementById('phase-name').textContent = phaseData.name;
+    document.getElementById('phase-name').style.color = phaseData.color;
+    document.getElementById('phase-desc').textContent = phaseData.desc;
+    document.getElementById('phase-kcal').textContent = phaseData.kcal;
+    document.getElementById('phase-kcal').style.color = phaseData.color;
+  } else {
+    banner.style.borderColor = 'var(--border)';
+    document.getElementById('phase-name').textContent = 'FUERA DEL PLAN';
+    document.getElementById('phase-desc').textContent = 'Este día no está en el plan';
+    document.getElementById('phase-kcal').textContent = '—';
+  }
+
+  // Macros
+  if (phaseData) {
+    const m = phaseData.macros;
+    document.getElementById('macro-p-val').textContent = m.p + 'g';
+    document.getElementById('macro-c-val').textContent = m.c + 'g';
+    document.getElementById('macro-g-val').textContent = m.g + 'g';
+    // progress based on meals checked
+    const meals = getMealsForPhase(phaseInfo?.key);
+    let totP = 0, totC = 0, totG = 0;
+    meals.forEach((meal, i) => {
+      if (dayData.meals[i]) { totP += meal.p; totC += meal.c; totG += meal.g; }
+    });
+    document.getElementById('macro-p-bar').style.width = Math.min(100, Math.round(totP/m.p*100)) + '%';
+    document.getElementById('macro-c-bar').style.width = Math.min(100, Math.round(totC/m.c*100)) + '%';
+    document.getElementById('macro-g-bar').style.width = Math.min(100, Math.round(totG/m.g*100)) + '%';
+  }
+
+  // Meals
+  const mealsContainer = document.getElementById('meals-container');
+  mealsContainer.innerHTML = '';
+  const meals = phaseInfo ? getMealsForPhase(phaseInfo.key) : [];
+  meals.forEach((meal, i) => {
+    const done = !!dayData.meals[i];
+    const card = document.createElement('div');
+    card.className = 'meal-card' + (done ? ' completed' : '');
+    card.innerHTML = `
+      <div class="meal-header" onclick="toggleMealExpand(${i})">
+        <div class="meal-check ${done ? 'done' : ''}" onclick="event.stopPropagation();toggleMeal(${i})"></div>
+        <div class="meal-info">
+          <div class="meal-time">${meal.time}</div>
+          <div class="meal-name">${meal.name}</div>
+        </div>
+        <div class="meal-kcal">${meal.kcal} kcal</div>
+      </div>
+      <div class="meal-foods">
+        ${meal.foods.map(f => `<div class="food-item">${f}</div>`).join('')}
+        <div class="meal-macros">${meal.p}g P · ${meal.c}g C · ${meal.g}g G</div>
+      </div>
+    `;
+    mealsContainer.appendChild(card);
+  });
+
+  // Workout
+  const wo = getWorkoutForPhase(phaseInfo);
+  document.getElementById('workout-name').textContent = wo.name;
+  document.getElementById('workout-note').textContent = wo.note;
+  const wc = document.getElementById('workout-check');
+  wc.className = 'workout-check' + (dayData.workout ? ' done' : '');
+
+  // Weight
+  const wi = document.getElementById('weight-input');
+  wi.value = dayData.weight || '';
+  renderWeightTrend();
+
+  // Agua
+  renderAgua(phaseData, dayData.agua || 0);
+
+  // Supps
+  renderSupps(dayData.supps || {});
+
+  // Notes
+  document.getElementById('notes-area').value = dayData.notes || '';
+
+  // Progress
+  updateProgress();
+}
+
+function toggleMealExpand(idx) {
+  const cards = document.querySelectorAll('.meal-card');
+  cards[idx]?.classList.toggle('open');
+}
+
+function toggleMeal(idx) {
+  const data = getDayData(currentDateKey);
+  data.meals[idx] = !data.meals[idx];
+  saveDayData(currentDateKey, data);
+  renderDay();
+}
+
+function toggleWorkout() {
+  const data = getDayData(currentDateKey);
+  data.workout = !data.workout;
+  saveDayData(currentDateKey, data);
+  renderDay();
+}
+
+function saveWeight() {
+  const data = getDayData(currentDateKey);
+  data.weight = document.getElementById('weight-input').value;
+  saveDayData(currentDateKey, data);
+  renderWeightTrend();
+}
+
+function renderWeightTrend() {
+  const trendEl = document.getElementById('weight-trend');
+  const weights = [];
+  for (let i = 0; i < 25; i++) {
+    const d = new Date('2026-04-07T12:00:00');
+    d.setDate(d.getDate() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const dd = getDayData(key);
+    if (dd.weight) weights.push({ key, w: parseFloat(dd.weight) });
+  }
+  if (weights.length >= 2) {
+    const last = weights[weights.length - 1].w;
+    const first = weights[0].w;
+    const diff = (last - first).toFixed(1);
+    const arrow = diff < 0 ? '▼' : diff > 0 ? '▲' : '=';
+    const color = diff < 0 ? 'var(--success)' : diff > 0 ? 'var(--accent3)' : 'var(--muted)';
+    trendEl.innerHTML = `<span style="color:${color}">${arrow} ${diff}kg desde inicio</span>`;
+  }
+}
+
+function renderAgua(phaseData, current) {
+  const target = phaseData ? phaseData.agua : 3;
+  const glasses = Math.round(target / 0.25);
+  document.getElementById('agua-target').textContent = `Objetivo: ${target}L`;
+  const container = document.getElementById('agua-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < glasses; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'agua-dot' + (i < current ? ' filled' : '');
+    dot.textContent = '💧';
+    dot.style.fontSize = '14px';
+    dot.onclick = () => {
+      const data = getDayData(currentDateKey);
+      data.agua = (data.agua === i + 1) ? i : i + 1;
+      saveDayData(currentDateKey, data);
+      renderAgua(phaseData, data.agua);
+      updateProgress();
+    };
+    container.appendChild(dot);
+  }
+}
+
+function renderSupps(suppsDone) {
+  const grid = document.getElementById('supps-grid');
+  grid.innerHTML = '';
+  SUPPLEMENTS.forEach((s, i) => {
+    const done = !!suppsDone[i];
+    const card = document.createElement('div');
+    card.className = 'supp-card' + (done ? ' done' : '');
+    card.innerHTML = `
+      <div class="supp-dot"></div>
+      <div>
+        <div class="supp-name">${s.name}</div>
+        <div class="supp-time">${s.time}</div>
+      </div>
+    `;
+    card.onclick = () => {
+      const data = getDayData(currentDateKey);
+      if (!data.supps) data.supps = {};
+      data.supps[i] = !data.supps[i];
+      saveDayData(currentDateKey, data);
+      renderSupps(data.supps);
+      updateProgress();
+    };
+    grid.appendChild(card);
+  });
+}
+
+function saveNotes() {
+  const data = getDayData(currentDateKey);
+  data.notes = document.getElementById('notes-area').value;
+  saveDayData(currentDateKey, data);
+}
+
+function updateProgress() {
+  const phaseInfo = getPhaseForDate(currentDateKey);
+  const data = getDayData(currentDateKey);
+  const meals = phaseInfo ? getMealsForPhase(phaseInfo.key) : [];
+  const totalItems = meals.length + 1 + SUPPLEMENTS.length; // meals + workout + supps
+  const doneItems =
+    Object.values(data.meals).filter(Boolean).length +
+    (data.workout ? 1 : 0) +
+    Object.values(data.supps || {}).filter(Boolean).length;
+  const pct = totalItems > 0 ? Math.round(doneItems / totalItems * 100) : 0;
+  document.getElementById('dp-pct').textContent = pct + '%';
+  document.getElementById('dp-bar').style.width = pct + '%';
+}
+
+// ============================================================
+// HISTORIAL TAB
+// ============================================================
+
+function renderHistorial() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  const weights = [];
+  const labels = [];
+
+  for (let i = 0; i < 25; i++) {
+    const d = new Date('2026-04-07T12:00:00');
+    d.setDate(d.getDate() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const dd = getDayData(key);
+    const phase = getPhaseForDate(key);
+
+    if (dd.weight || Object.keys(dd.meals).length > 0 || dd.workout) {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      const phaseColors = { phase1:'#47c8ff', phase2low:'#ff9f47', phase2maint:'#ff9f47', phase3a:'#ff6b47', phase3b:'#e8ff47' };
+      const phaseNames = { phase1:'F1', phase2low:'F2↓', phase2maint:'F2→', phase3a:'F3A', phase3b:'F3B🔥' };
+      const pc = phase ? phaseColors[phase.key] : '#5a5a70';
+      const pn = phase ? phaseNames[phase.key] : '—';
+      const mealsCount = Object.values(dd.meals).filter(Boolean).length;
+      const mealMax = phase ? getMealsForPhase(phase.key).length : 6;
+      const dateLabel = d.toLocaleDateString('es', { day: 'numeric', month: 'short' });
+      item.innerHTML = `
+        <div class="history-date">D${i+1}<br>${dateLabel}</div>
+        <div class="history-weight">${dd.weight ? dd.weight + 'kg' : '—'}</div>
+        <div class="history-phase" style="background:${pc}22;color:${pc};border:1px solid ${pc}44">${pn}</div>
+        <div class="history-meals">${mealsCount}/${mealMax} comidas<br>${dd.workout ? '✅ gym' : '—'}</div>
+      `;
+      list.appendChild(item);
+    }
+
+    if (dd.weight) {
+      weights.push(parseFloat(dd.weight));
+      labels.push(`D${i+1}`);
+    }
+  }
+
+  if (list.children.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-family:var(--font-mono);font-size:12px;text-align:center;padding:24px">Sin datos aún — empieza a registrar 💪</div>';
+  }
+
+  // Chart
+  drawWeightChart(weights, labels);
+}
+
+function drawWeightChart(weights, labels) {
+  const canvas = document.getElementById('weight-chart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = 200;
+  ctx.scale(2, 2);
+  const w = canvas.offsetWidth / 2;
+  const h = 100;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (weights.length < 2) {
+    ctx.fillStyle = '#5a5a70';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sin suficientes datos aún', w/2, h/2);
+    return;
+  }
+
+  const min = Math.min(...weights) - 0.5;
+  const max = Math.max(...weights) + 0.5;
+  const pad = { top: 10, bottom: 20, left: 30, right: 10 };
+  const cw = w - pad.left - pad.right;
+  const ch = h - pad.top - pad.bottom;
+
+  const xScale = cw / (weights.length - 1);
+  const yScale = ch / (max - min);
+
+  // Grid
+  ctx.strokeStyle = '#1e1e28';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (ch / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
+  }
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#e8ff47';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  weights.forEach((w2, i) => {
+    const x = pad.left + i * xScale;
+    const y = pad.top + ch - (w2 - min) * yScale;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  weights.forEach((w2, i) => {
+    const x = pad.left + i * xScale;
+    const y = pad.top + ch - (w2 - min) * yScale;
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8ff47';
+    ctx.fill();
+  });
+
+  // Y labels
+  ctx.fillStyle = '#5a5a70';
+  ctx.font = '8px monospace';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 2; i++) {
+    const v = (min + (max - min) * (1 - i/2)).toFixed(1);
+    const y = pad.top + (ch / 2) * i;
+    ctx.fillText(v, pad.left - 4, y + 3);
+  }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`nav-${tab}`).classList.add('active');
+  if (tab === 'historial') renderHistorial();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('theme-btn').textContent = isLight ? '🌑' : '🌙';
+  localStorage.setItem('ibiza_theme', isLight ? 'light' : 'dark');
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('ibiza_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-btn').textContent = '🌑';
+  }
+}
+
+function init() {
+  initTheme();
+  // Default to today if within plan, else first day
+  const today = todayKey();
+  const phaseToday = getPhaseForDate(today);
+  if (phaseToday) {
+    currentDateKey = today;
+  } else {
+    currentDateKey = '2026-04-07';
+  }
+  buildDayNav();
+  renderDay();
+}
+
+init();
+</script>
+
+</body>
+</html>
